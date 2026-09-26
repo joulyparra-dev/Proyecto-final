@@ -1,0 +1,1081 @@
+{
+  "name": "Entrega final",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=ROL\nSos un especialista en creación de contenido para Instagram para una marca de velas de soja.\n\nTAREA\nGenerá un caption para Instagram basado en {{ $('Airtable Trigger').item.json.fields[\"Idea Semilla\"] }}\n sigue las directrices con  la informacion del RAG {{ $json.fields }}\n\nFORMATO\n- Texto principal\n- Llamado a la acción\n- 3 a 5 hashtags\n\nDevolvé solamente el caption terminado, no incluyas encabezados como \"Texto principal\",\n\"Llamado a la acción\" o \"Hashtags\".\nEl resultado debe estar listo para copiar y publicar.\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -416,
+        352
+      ],
+      "id": "89e0c645-835f-4162-9fb6-1364823da8a4",
+      "name": "AI Agent",
+      "retryOnFail": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "applhpypOigfUDmIW",
+          "mode": "list",
+          "cachedResultName": "Redes Sociales",
+          "cachedResultUrl": "https://airtable.com/applhpypOigfUDmIW"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblsxgth9c7gk1AqB",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/applhpypOigfUDmIW/tblsxgth9c7gk1AqB"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Aprobado": false,
+            "Estado": "Pendiente de aprobación",
+            "Caption generado": "={{ $json.output }}",
+            "id": "={{ $('Airtable Trigger').item.json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true
+            },
+            {
+              "id": "Idea Semilla",
+              "displayName": "Idea Semilla",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Generando",
+                  "value": "Generando"
+                },
+                {
+                  "name": "Pendiente de aprobación",
+                  "value": "Pendiente de aprobación"
+                },
+                {
+                  "name": "Aprobado",
+                  "value": "Aprobado"
+                },
+                {
+                  "name": "Rechazado",
+                  "value": "Rechazado"
+                },
+                {
+                  "name": "Publicado",
+                  "value": "Publicado"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Caption generado",
+              "displayName": "Caption generado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Aprobado",
+              "displayName": "Aprobado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Ultima modificación",
+              "displayName": "Ultima modificación",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        -96,
+        272
+      ],
+      "id": "21142623-1bb2-4c43-bf17-b51b1ac32d89",
+      "name": "Agrega contenido generado",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "LrHoRE4LBPMUDXh1",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "operation": "sendAndWait",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0BSQ0L0NJE",
+          "mode": "list",
+          "cachedResultName": "shinrai-art"
+        },
+        "message": "=🚀 Nuevo borrador para el contenido generado\n\n📝 Idea: {{ $json.fields[\"Idea Semilla\"] }}\n\n📌 Caption Generado: {{ $json.fields[\"Caption generado\"] }}\n\nEl contenido ya está listo para revisión.\n\n👉 ¿Querés aprobar este borrador para continuar con el flujo?\n\n\n",
+        "approvalOptions": {
+          "values": {
+            "approvalType": "double"
+          }
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        80,
+        272
+      ],
+      "id": "43457e34-be82-4d92-b541-124a5509ce3e",
+      "name": "Pregunta por aprobación",
+      "webhookId": "fc658dd3-c38b-4bb6-93fe-9e701d00b068",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "s3d6IasRk8XeI8On",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5-mini",
+          "mode": "list",
+          "cachedResultName": "gpt-5-mini"
+        },
+        "responsesApiEnabled": false,
+        "options": {
+          "temperature": 1
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -416,
+        528
+      ],
+      "id": "2b3f7cbf-e801-4a0a-ae1d-673feacc4c14",
+      "name": "Genera idea de contenido",
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "authentication": "airtableOAuth2Api",
+        "baseId": {
+          "__rl": true,
+          "value": "applhpypOigfUDmIW",
+          "mode": "id"
+        },
+        "tableId": {
+          "__rl": true,
+          "value": "tblsxgth9c7gk1AqB",
+          "mode": "id"
+        },
+        "triggerField": "Ultima modificación",
+        "additionalFields": {
+          "viewId": "Estado generando"
+        }
+      },
+      "type": "n8n-nodes-base.airtableTrigger",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        352
+      ],
+      "id": "35697178-c518-412a-82a6-ad3688942f3a",
+      "name": "Airtable Trigger",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "LrHoRE4LBPMUDXh1",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7a5d8ed3-151c-4e65-8e78-5a57f984023b",
+              "leftValue": "={{ $json.data.approved }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        208,
+        272
+      ],
+      "id": "807d60eb-08f7-4759-bc49-434fa947ce7d",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "applhpypOigfUDmIW",
+          "mode": "list",
+          "cachedResultName": "Redes Sociales",
+          "cachedResultUrl": "https://airtable.com/applhpypOigfUDmIW"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblsxgth9c7gk1AqB",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/applhpypOigfUDmIW/tblsxgth9c7gk1AqB"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Aprobado": false,
+            "Estado": "Rechazado",
+            "id": "={{ $('Airtable Trigger').item.json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Idea Semilla",
+              "displayName": "Idea Semilla",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Generando",
+                  "value": "Generando"
+                },
+                {
+                  "name": "Pendiente de aprobación",
+                  "value": "Pendiente de aprobación"
+                },
+                {
+                  "name": "Aprobado",
+                  "value": "Aprobado"
+                },
+                {
+                  "name": "Rechazado",
+                  "value": "Rechazado"
+                },
+                {
+                  "name": "Publicado",
+                  "value": "Publicado"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Caption generado",
+              "displayName": "Caption generado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Aprobado",
+              "displayName": "Aprobado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Ultima modificación",
+              "displayName": "Ultima modificación",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        368,
+        336
+      ],
+      "id": "5b46c502-5339-4a11-85a1-dbc2adfcce28",
+      "name": "Actualiza Estado a \"Rechazado\"",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "LrHoRE4LBPMUDXh1",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "applhpypOigfUDmIW",
+          "mode": "list",
+          "cachedResultName": "Redes Sociales",
+          "cachedResultUrl": "https://airtable.com/applhpypOigfUDmIW"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblsxgth9c7gk1AqB",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/applhpypOigfUDmIW/tblsxgth9c7gk1AqB"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Aprobado": true,
+            "Estado": "Publicado",
+            "id": "={{ $('Airtable Trigger').item.json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Idea Semilla",
+              "displayName": "Idea Semilla",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Generando",
+                  "value": "Generando"
+                },
+                {
+                  "name": "Pendiente de aprobación",
+                  "value": "Pendiente de aprobación"
+                },
+                {
+                  "name": "Aprobado",
+                  "value": "Aprobado"
+                },
+                {
+                  "name": "Rechazado",
+                  "value": "Rechazado"
+                },
+                {
+                  "name": "Publicado",
+                  "value": "Publicado"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Caption generado",
+              "displayName": "Caption generado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Aprobado",
+              "displayName": "Aprobado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Ultima modificación",
+              "displayName": "Ultima modificación",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        704,
+        128
+      ],
+      "id": "4fcb918a-8f93-4516-a6b0-ff41a7b3ee16",
+      "name": "Actualiza Estado a \"Publicado\"",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "LrHoRE4LBPMUDXh1",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "applhpypOigfUDmIW",
+          "mode": "list",
+          "cachedResultName": "Redes Sociales",
+          "cachedResultUrl": "https://airtable.com/applhpypOigfUDmIW"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblsxgth9c7gk1AqB",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/applhpypOigfUDmIW/tblsxgth9c7gk1AqB"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Aprobado": true,
+            "Estado": "Aprobado",
+            "id": "={{ $('Airtable Trigger').item.json.id }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Idea Semilla",
+              "displayName": "Idea Semilla",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Generando",
+                  "value": "Generando"
+                },
+                {
+                  "name": "Pendiente de aprobación",
+                  "value": "Pendiente de aprobación"
+                },
+                {
+                  "name": "Aprobado",
+                  "value": "Aprobado"
+                },
+                {
+                  "name": "Rechazado",
+                  "value": "Rechazado"
+                },
+                {
+                  "name": "Publicado",
+                  "value": "Publicado"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Caption generado",
+              "displayName": "Caption generado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Aprobado",
+              "displayName": "Aprobado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Ultima modificación",
+              "displayName": "Ultima modificación",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        368,
+        128
+      ],
+      "id": "9f87cc3c-39ff-401b-bf0b-b9b375df3ff1",
+      "name": "Actualiza checkbox a true y \"Estado\" a \"Aprobado\"",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "LrHoRE4LBPMUDXh1",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0C4A9K503G",
+          "mode": "list",
+          "cachedResultName": "contenido-publicado"
+        },
+        "text": "=🚀 *¡NUEVO CONTENIDO APROBADO Y LISTO PARA PUBLICAR!*  📌 *Título / Idea:* {{ $('Agrega contenido generado').item.json.fields[\"Idea Semilla\"] }}\n📝 *Copia del Post:* {{ $('AI Agent').item.json.output }}\n-------------------------------------------------- ✅ \n*Estado:* Aprobado vía HITL | 🤖 *Modelo:* GPT-5-mini",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        544,
+        128
+      ],
+      "id": "bd5f4314-ea72-4d3a-892d-6ad41e1bb658",
+      "name": "Publico en #Contenido-publicado",
+      "webhookId": "f190ed6c-65d4-4b16-9af0-0c0021961d8b",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "s3d6IasRk8XeI8On",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0C476N1MB7",
+          "mode": "list",
+          "cachedResultName": "soporte-errores"
+        },
+        "text": "=⚠️ *¡Atención! Falló la generación de contenido*  \n📌 *ID:* {{ $json.id }} \n✨ *Idea Semilla:* {{ $('Airtable Trigger').item.json.fields[\"Idea Semilla\"] }}\n💥 *Detalle:* {{ $('AI Agent').item.json.error }}",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        96,
+        480
+      ],
+      "id": "9a60a98f-e592-41dc-8528-b5b78bd6177a",
+      "name": "Mensaje a #soporte-errores",
+      "webhookId": "bdfe63cb-41ea-4ed6-89ca-765365cd374b",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "s3d6IasRk8XeI8On",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "update",
+        "base": {
+          "__rl": true,
+          "value": "applhpypOigfUDmIW",
+          "mode": "list",
+          "cachedResultName": "Redes Sociales",
+          "cachedResultUrl": "https://airtable.com/applhpypOigfUDmIW"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tblsxgth9c7gk1AqB",
+          "mode": "list",
+          "cachedResultName": "Table 1",
+          "cachedResultUrl": "https://airtable.com/applhpypOigfUDmIW/tblsxgth9c7gk1AqB"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Aprobado": false,
+            "id": "={{ $('Airtable Trigger').item.json.id }}",
+            "Estado": "Error"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            },
+            {
+              "id": "Idea Semilla",
+              "displayName": "Idea Semilla",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Estado",
+              "displayName": "Estado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "options",
+              "options": [
+                {
+                  "name": "Generando",
+                  "value": "Generando"
+                },
+                {
+                  "name": "Pendiente de aprobación",
+                  "value": "Pendiente de aprobación"
+                },
+                {
+                  "name": "Aprobado",
+                  "value": "Aprobado"
+                },
+                {
+                  "name": "Rechazado",
+                  "value": "Rechazado"
+                },
+                {
+                  "name": "Publicado",
+                  "value": "Publicado"
+                },
+                {
+                  "name": "Error",
+                  "value": "Error"
+                }
+              ],
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Caption generado",
+              "displayName": "Caption generado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Aprobado",
+              "displayName": "Aprobado",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "Ultima modificación",
+              "displayName": "Ultima modificación",
+              "required": false,
+              "defaultMatch": false,
+              "canBeUsedToMatch": true,
+              "display": true,
+              "type": "string",
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        -96,
+        480
+      ],
+      "id": "7b4c902d-ad4a-417b-8940-2d89dcb580a1",
+      "name": "Actualiza estado a error",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "LrHoRE4LBPMUDXh1",
+          "name": "Airtable account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "airtableOAuth2Api",
+        "operation": "search",
+        "base": {
+          "__rl": true,
+          "value": "applhpypOigfUDmIW",
+          "mode": "list",
+          "cachedResultName": "Redes Sociales",
+          "cachedResultUrl": "https://airtable.com/applhpypOigfUDmIW"
+        },
+        "table": {
+          "__rl": true,
+          "value": "tbllSnpmVNputtqa6",
+          "mode": "list",
+          "cachedResultName": "Identidad de Marca",
+          "cachedResultUrl": "https://airtable.com/applhpypOigfUDmIW/tbllSnpmVNputtqa6"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.airtable",
+      "typeVersion": 2.2,
+      "position": [
+        -640,
+        352
+      ],
+      "id": "cbf255e3-3056-4525-b6b5-96a7a757cf0f",
+      "name": "Identidad de marca ",
+      "credentials": {
+        "airtableOAuth2Api": {
+          "id": "LrHoRE4LBPMUDXh1",
+          "name": "Airtable account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Agrega contenido generado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Actualiza estado a error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agrega contenido generado": {
+      "main": [
+        [
+          {
+            "node": "Pregunta por aprobación",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pregunta por aprobación": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Genera idea de contenido": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Airtable Trigger": {
+      "main": [
+        [
+          {
+            "node": "Identidad de marca ",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Actualiza checkbox a true y \"Estado\" a \"Aprobado\"",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Actualiza Estado a \"Rechazado\"",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualiza checkbox a true y \"Estado\" a \"Aprobado\"": {
+      "main": [
+        [
+          {
+            "node": "Publico en #Contenido-publicado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Publico en #Contenido-publicado": {
+      "main": [
+        [
+          {
+            "node": "Actualiza Estado a \"Publicado\"",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualiza estado a error": {
+      "main": [
+        [
+          {
+            "node": "Mensaje a #soporte-errores",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Identidad de marca ": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "f80f0e21-7cee-40c6-a289-fa51462e92cf",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "7b1bedbbff4788933b836651223981ec8b13f7f88149f57a481a7a3c74d9c594"
+  },
+  "nodeGroups": [],
+  "id": "BNTYnKOzpjA54po9",
+  "tags": []
+}
